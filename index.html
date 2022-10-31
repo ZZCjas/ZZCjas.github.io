@@ -4,60 +4,13 @@
 
 <title>赵紫辰的个人空间</title>
 
-<style>
-	textarea {
-		width: 40rem;
-		height: 30rem;
-	}
+<h2>Hi!我是赵紫辰,很高兴你来访问我的个人空间!</h2>
 
-	pre {
-		width: 40rem;
-		white-space: pre-wrap;
-		word-wrap: break-word;
-	}
-</style>
+<h3>这是我制作的一些实用工具:</h3>
 
-<h2>Hi!我是赵紫辰,很高兴你来访问我的个人空间!</h1>
+<a href="https://zzcjas.github.io/brainfuck">文本到Brainfuck转换器</a>
 
-<h3>这是我的文本到Brainfuck转换器:</h3>
-
-<p><textarea id = "text"></textarea></p>
-
-<p><input id = "convert" type = "button" value = "转换" /></p>
-
-<h3>结果:</h3>
-
-<pre id = "result"></pre>
-
-<script>
-	"use strict";
-
-	let textNode = document.querySelector("#text");
-	let convertNode = document.querySelector("#convert");
-	let resultNode = document.querySelector("#result");
-
-	let encoder = new TextEncoder();
-
-	let convertText = function () {
-		let data = encoder.encode(textNode.value);
-
-		let result = ">--->--->--->"
-
-		for (let i = data.length - 1; i >= 0; --i) {
-			let byte = data[i];
-
-			for (let j = 0; j < 3; ++j) {
-				result += ["---", "--", "-", "", "+", "++", "+++"][byte % 7] + ">";
-				byte = Math.floor(byte / 7);
-			}
-		}
-
-		resultNode.textContent = result + "+[<+++[-<+++++++>]<+++[-<+++++++>]<+++[.>]<]";
-	};
-
-	document.addEventListener("DOMContentLoaded", convertText);
-	convertNode.addEventListener("click", convertText);
-</script>
+<a href="https://zzcjas.github.io/funtion">函数图绘制工具</a>
 
 <h3>你可以在以下网站找到我:</h3>
 <a href="https://github.com/ZZCjas/">我的Github账号</a>
