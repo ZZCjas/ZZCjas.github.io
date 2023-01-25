@@ -9,15 +9,11 @@
 </head>
 <body>
 <div>
-    <div id="主体">
-      <div id="标题">英语版狗屁不通文章生成器</div>
-      <div id="主题">
-        <span>主题</span>
-        <input>
-        <button onclick="生成文章()">生成</button>
-      </div>
-      <div id="文章"></div>
-    </div>
+    <h2>    英语版狗屁不通文章生成器</h2>
+    <label>
+        <input id="title" type="text" value="" />
+    </label>
+    <button onclick="make()">生成</button>
     <div style="text-indent: 1em;" id="article"></div>
     <script>
         function make() {
