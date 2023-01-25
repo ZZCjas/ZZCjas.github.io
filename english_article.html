@@ -1,31 +1,7 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>英语版狗屁不通文章生成器</title>
-    <link rel="shortcut icon" href="favicon.png" />
-    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.js"></script>
-    <script src="main.js"></script>
-</head>
-<body>
-<div>
-    <h2>英语版狗屁不通文章生成器</h2>
-    <label>
-        <input id="title" type="text" value="" />
-    </label>
-    <button onclick="make()">生成</button>
-    <div style="text-indent: 1em;" id="article"></div>
-    <script>
-        function make() {
-            let title = $('#title').val()
-            let article = makeArticle(title)
-            console.log(article)
-            for (let i = 0; i < article.length; i++) {
-                $('#article').append(`<p style="text-indent: 1em;">${article[i]}</p>`)
-            }
-            $('#article').append('<hr />')
-        }
-    </script>
-</div>
-</body>
-</html>
+<!doctype HTML>
+<link rel="shortcut icon" href="favicon.png" />
+<meta charset = "UTF-8" />
+<title>英语版狗屁不通文章生成器</title>
+<script src="script.js"></script>
+<h2>英语版狗屁不通文章生成器</h2>
+<p>主题:<input value=""></input><div><button onclick="generateEssay()"style="cursor:pointer;">生成</button></div><div id="essay"></p>
