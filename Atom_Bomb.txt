@@ -1,0 +1,1 @@
+/summon minecraft:fireball ~ ~1 ~ {CustomName:"Atom Bomb",Fire:30,direction:[0.0,0.0,0.0],ExplosionPower:127,crit:1b}
