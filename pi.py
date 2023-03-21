@@ -35,5 +35,5 @@ while w<ZZZC:
 
 time_end = time.time()
 
-print(f'迭代{w}次,圆周率为：\n{(pi)}')
+print(f'迭代{w}次后,算得圆周率为:\n{(pi)}')
 print(f'计算完成,花了{time_end-time_start}秒')
