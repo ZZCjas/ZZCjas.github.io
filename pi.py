@@ -13,6 +13,7 @@ p=1
 w=0
 time_start=time.time()
 while w<y:
+    print("进行第",w+1,"次迭代")
     a1=(a+b)/2
     b1=D(a*b).sqrt()
     t1=D(t)-p*((a-(a+b)/2)**2)
