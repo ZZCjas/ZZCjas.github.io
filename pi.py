@@ -5,7 +5,7 @@ x=int(input("请输入计算到圆周率的小数点后几位:"))
 y=int(input("请输入迭代次数(迭代次数越多,结果越精确):"))
 print("计算中...")
 D=decimal.Decimal
-decimal.getcontext().prec=x
+decimal.getcontext().prec=x+1
 a=1
 b=1/D(2).sqrt()
 t=1/4
