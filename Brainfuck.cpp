@@ -1,6 +1,5 @@
 #include <iostream>
 #include <string>
-#include <conio.h>
 using namespace std;
 string s;
 int ptr=50000,top=0;
