@@ -1,13 +1,42 @@
 #include <cstdio>
 #include <unistd.h>
 #include <iostream>
+#include <sstream>
+#include <fstream>
 using namespace std;
 string s;
 string name;
-int main()
+stringstream ss; 
+int main(int argc,char *argv[])
 {
-	cout<<"Brainfuck Compile System,Copyright 2023 ZZCjas,G++ is Needed.\nInput the Brainfuck code:";
-	getline(cin,s);
+	if(argc>=2)
+	{
+		ifstream fin(argv[1]);
+		if(!fin)
+		{
+			cerr<<"File Not Found.\n";
+			return 0;
+		}
+		fin.tie(0);
+	    ss.tie(0);
+		ss<<fin.rdbuf();
+		s=ss.str();
+		string bf=s;
+		s="";
+		for(int i=0;i<bf.size();i++)
+		{
+			if(bf[i]!=' '&&bf[i]!='\n'&&bf[i]!='\r')
+			{
+				s+=bf[i];
+			}
+		}
+		bf.clear();
+	}
+	if(argc<2)
+	{
+		cout<<"Brainfuck Compile System,Copyright 2023 ZZCjas,G++ is Needed.\nInput the Brainfuck code:";
+		getline(cin,s);
+	}
 	cout<<"Input the Code\'s name:";
 	getline(cin,name);
 	int p=_dup(1);
