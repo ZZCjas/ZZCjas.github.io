@@ -1,16 +1,17 @@
 #include <iostream>
 #include <string>
+#include <conio.h>
 using namespace std;
 string s;
 int ptr=50000,top=0;
-int paper[100001];
-int st[100001];
+int paper[1000001];
+int st[1000001];
 int main()
 {
 	ios::sync_with_stdio(0);
 	cin.tie(0);
 	cout.tie(0);
-	cin>>s;
+	getline(cin,s);
 	for(int i=0;i<s.size();i++)
 	{
 		if(!top&&s[i]==']')
@@ -44,9 +45,9 @@ int main()
 		else if(s[i]=='>')
 		{
 			ptr++;
-			if(ptr>=100000)
+			if(ptr>=1000000)
 			{
-				cout<<"Runtime Error\n";
+				cout<<"Memory Limit Exceed\n";
 				return 0;
 			}
 		}
