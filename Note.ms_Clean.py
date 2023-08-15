@@ -4,7 +4,7 @@ from selenium.webdriver import Keys, ActionChains
 import time
 import sys
 
-def edit(val):
+def edit(val,t):
     cmd_ctrl = Keys.COMMAND if sys.platform == 'darwin' else Keys.CONTROL
     driver=webdriver.Edge();
     while True:
@@ -26,4 +26,6 @@ print("Note.ms自动化修改脚本,By ZZCjas@Github.com")
 
 k=input("请输入要修改成的内容:")
 
-edit(k)    
+t=input("目标剪贴板的编号:")
+
+edit(k,t)    
