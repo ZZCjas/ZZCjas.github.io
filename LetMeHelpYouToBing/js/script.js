@@ -1,13 +1,3 @@
-/**
- * 让我帮你必应一下【重制版】
- * GitHub 开源地址：https://github.com/mengkunsoft/lmbtfy
- **
- * 原始版本来自 bangbang(http://lmbtfy.cn/)，mengkun(https://mkblog.cn) 在原作的基础上进行了重制，风格变更为新版必应 UI，并适配了移动端
- * 交互效果参考了 不会必应么？(http://buhuibaidu.me/)
- **
- * 转载或使用时，还请保留以上信息，谢谢！
- */ 
-
 /* 低版本 IE polyfill */ 
 if(!window.location.origin) {
     window.location.origin = window.location.protocol + "//" + window.location.hostname + (window.location.port ? ':' + window.location.port: '');
@@ -63,7 +53,7 @@ $(function() {
                         $kw.val(query.substr(0, i));
                         if (++i > query.length) {
                             clearInterval(typeInterval);
-                            $tips.html('3、点击下“必应一下”按钮');
+                            $tips.html('3、点击一下“搜索网页”按钮');
                             
                             $arrow.removeClass('active').fadeIn().animate({
                                 left: $searchSubmit.offset().left + $searchSubmit.width()  / 2 + 'px',
@@ -91,7 +81,7 @@ $(function() {
         $arrow.stop().hide();
         $kw.val(query);
         query = false;
-        $tips.html('输入一个问题，然后点击必应一下');
+        $tips.html('输入一个问题，然后点击搜索网页');
     });
     
     /* 提交 */
