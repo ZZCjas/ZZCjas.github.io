@@ -92,6 +92,12 @@ int main(int argc,char *argv[])
 				system("pause");
 				return 0;
 			}
+			else
+			{
+				color(2);
+				cout<<"As same as "<<list[i]+s+".zip"<<'\n';
+				color(7);
+			}
 		}
 		else if(DownloadFiles((list[i]+s+".cpp").c_str(),(s+".tmp").c_str())==TRUE)
 		{
@@ -121,6 +127,12 @@ int main(int argc,char *argv[])
 				color(7);
 				system("pause");
 				return 0;
+			}
+			else
+			{
+				color(2);
+				cout<<"As same as "<<list[i]+s+".cpp"<<'\n';
+				color(7);
 			}
 		}
 		else
