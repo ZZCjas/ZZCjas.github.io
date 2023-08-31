@@ -27,11 +27,11 @@ BOOL DownloadFiles(const CHAR* url,const CHAR* downloadPath)
 	}
 }
 string s;
-string list[6]={
+const string list[6]={
 	"",
 	"https://zzcjas.github.io/",
 	"https://github.com/ZZCjas/Tools/raw/main/",
-	"https://githubfast.com/ZZCjas/Tools/raw/main/",
+	"https://external.githubfast.com/https/raw.githubusercontent.com/ZZCjas/Tools/main/",
 	"https://hub.nuaa.cf/ZZCjas/Tools/raw/main/",
 	"https://kgithub.com/ZZCjas/Tools/raw/main/"
 };
@@ -47,36 +47,66 @@ void color(int x)
 		SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE),7);
 	}
 }
+string link;
+string alltol(string s)
+{
+	for(int i=0;i<s.size();i++)
+	{
+		s[i]=tolower(s[i]);
+	}
+	return s;
+}
 int main(int argc,char *argv[])
 {
+	fstream check("ZSUS.ini");
+	if(!check)
+	{
+		FILE *p=fopen("ZSUS.ini","w");
+		fprintf(p,"# Write the links that you want to check there\n");
+		for(int i=1;i<=5;i++)
+		{
+			fprintf(p,"%s\n",list[i].c_str());
+		}
+		fclose(p);
+//		config<<"# Write the links that you want to check down there\n";
+//		for(int i=1;i<=5;i++)
+//		{
+//			config<<list[i]<<'\n';
+//		}
+//		config.flush();
+	}
 	if(argc==1)
 	{
-		cout<<"ZZCjas\'s Software Install&Updating System(ZSUS)\nInput the name of my software that you want to install&update:";
+		cout<<"ZZCjas\'s Software Updating&Installing System(ZSUS)\nPower By Urlmon and tar\nInput the name of the software that you want to install or update:";
 		cin>>s;
+		getchar();
 	}
 	else
 	{
+		cout<<"ZZCjas\'s Software Updating&Installing System(ZSUS)\nPower By Urlmon and tar\n";
 		s=argv[1];
 	}
-	for(int i=1;i<=5;i++)
+	ifstream config("ZSUS.ini");
+	while(getline(config,link))
 	{
-		if(GetUserDefaultUILanguage()==2052&&i==2)
+		if(link[0]=='#')
 		{
-			color(6); 
-			cout<<"WARNING:Skipping github.com Because it is hard to visit it in Chinese Mainland\n";
-			color(7);
 			continue;
 		}
-		if(DownloadFiles((list[i]+s+".zip").c_str(),(s+".tmp").c_str())==TRUE) 
+		cout<<"Checking "<<link<<'\n'; 
+		if(DownloadFiles((link+s+".zip").c_str(),(s+".tmp").c_str())==TRUE) 
 		{
 			ifstream fin(s+".zip");
 			if(!fin)
 			{
 				color(2);
-				cout<<"Download:Finished\nNow unzipping...";
+				cout<<"Download:Finished\nNow unzipping...\n";
+				rename((s+".tmp").c_str(),(s+".zip").c_str());
 				color(7);
-				system(("tar -xzvf "+s+".zip").c_str());
-				cout<<"Installed from "<<list[i]+s+".zip"<<" Successfully.\n";
+				system(("tar>nul 2>nul -xzvf "+s+".zip").c_str());
+				color(2);
+				cout<<"Installed from "<<link<<" Successfully.\n";
+				color(7);
 				system("pause");
 				return 0;
 			}
@@ -85,31 +115,33 @@ int main(int argc,char *argv[])
 				remove((s+".zip").c_str());
 				rename((s+".tmp").c_str(),(s+".zip").c_str());
 				color(2);
-				cout<<"Download:Finished\nNow unzipping...";
+				cout<<"Download:Finished\nNow unzipping...\n";
 				color(7);
-				system(("tar -xzvf "+s+".zip").c_str());
-				cout<<"Updated from "<<list[i]+s+".zip"<<" Successfully.\n";
+				system(("tar>nul 2>nul -xzvf "+s+".zip").c_str());
+				color(2);
+				cout<<"Updated from "<<link<<" Successfully.\n";
+				color(7);
 				system("pause");
 				return 0;
 			}
 			else
 			{
 				color(2);
-				cout<<"As same as "<<list[i]+s+".zip"<<'\n';
+				cout<<"Your "<<s<<" is already the newest version on the "<<link<<'\n';
 				color(7);
 			}
 		}
-		else if(DownloadFiles((list[i]+s+".cpp").c_str(),(s+".tmp").c_str())==TRUE)
+		else if(DownloadFiles((link+s+".cpp").c_str(),(s+".tmp").c_str())==TRUE)
 		{
 			ifstream fin(s+".cpp");
 			if(!fin)
 			{
 				color(2);
-				cout<<"Download:Finished\nNow compiling...";
+				cout<<"Download:Finished\nNow compiling...\n";
 				color(7);
 				system(("g++ "+(s+".cpp")+" -o "+(s+".exe")+" -O2 -Wall -std=c++11").c_str());
 				color(2);
-				cout<<"Installed from "<<list[i]+s+".cpp"<<" Successfully.\n";
+				cout<<"Installed from "<<link<<" Successfully.\n";
 				color(7);
 				system("pause");
 				return 0;
@@ -123,7 +155,7 @@ int main(int argc,char *argv[])
 				color(7);
 				system(("g++ "+(s+".cpp")+" -o "+(s+".exe")+" -O2 -Wall -std=c++11").c_str());
 				color(2);
-				cout<<"Updated from "<<list[i]+s+".cpp"<<" Successfully.\n";
+				cout<<"Updated from "<<link<<" Successfully.\n";
 				color(7);
 				system("pause");
 				return 0;
@@ -131,15 +163,15 @@ int main(int argc,char *argv[])
 			else
 			{
 				color(2);
-				cout<<"As same as "<<list[i]+s+".cpp"<<'\n';
+				cout<<"Your "<<s<<" is already the newest version on the "<<link<<'\n';
 				color(7);
 			}
 		}
 		else
 		{
 			color(4);
-			cout<<"ERROR:"<<list[i]+s+".cpp"<<" Not found\n";
-			cout<<"ERROR:"<<list[i]+s+".zip"<<" Not found\n";
+			cout<<"ERROR:"<<link+s+".cpp"<<" Not found\n";
+			cout<<"ERROR:"<<link+s+".zip"<<" Not found\n";
 			color(7);
 		}
 	}
