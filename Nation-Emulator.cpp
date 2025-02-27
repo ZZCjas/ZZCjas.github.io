@@ -9,9 +9,9 @@
 #include <ctime>
 #include <set>
 using namespace std;
-const int stuckcnt=5000;//åˆ°stuckcntæ—¶ç›´æ¥æšä¸¾,ä¸ä½¿ç”¨éšæœºæ•° 
-string l[7]={"","çŸ³å™¨æ—¶ä»£","é’é“œæ—¶ä»£","é“å™¨æ—¶ä»£","å·¥ä¸šæ—¶ä»£","åŸå­æ—¶ä»£","ä¿¡æ¯æ—¶ä»£"};
-string so[7]={"","çŸ³æ–§æ­¥å…µ","æŒçŸ›æ­¥å…µ","é“ç”²æ­¥å…µ","æ­¥æªæ‰‹","æ­¥å¦ç»“åˆè¿","é‡è£…åˆæˆæ—…"};
+const int stuckcnt=5000;//µ½stuckcntÊ±Ö±½ÓÃ¶¾Ù,²»Ê¹ÓÃËæ»úÊı 
+string l[7]={"","Ê¯Æ÷Ê±´ú","ÇàÍ­Ê±´ú","ÌúÆ÷Ê±´ú","¹¤ÒµÊ±´ú","Ô­×ÓÊ±´ú","ĞÅÏ¢Ê±´ú"};
+string so[7]={"","Ê¯¸«²½±ø","³ÖÃ¬²½±ø","Ìú¼×Æï±ø","²½±øÁ¬","Ì¹¿ËÁ¬","ÖØ×°ºÏ³ÉÂÃ"};
 struct nation
 {
 	string name;
@@ -33,7 +33,7 @@ nation x[10000001];
 				return;
 			}
 		}
-		cout<<"æ‰€æœ‰å›½å®¶éƒ½ç­äº¡äº†,ä¸–ç•Œå†æ¬¡æ¢å¤äº†æ²‰å¯‚......\n";
+		cout<<"ËùÓĞ¹ú¼Ò¶¼ÃğÍöÁË,ÊÀ½çÔÙ´Î»Ö¸´ÁË³Á¼Å......\n";
 		system("pause");
 		exit(0);
 	}
@@ -43,10 +43,10 @@ nation x[10000001];
 		{
 			if(x[i].alive)
 			{
-				cout<<x[i].name<<"ç§°éœ¸äº†ä¸–ç•Œ!\n";
-				cout<<x[i].name<<"æ•°æ®:\n";
-				cout<<"æˆ˜åŠ›:"<<x[i].army<<endl;
-				cout<<"æ–‡æ˜ç­‰çº§:"<<l[x[i].level]<<endl;
+				cout<<x[i].name<<"³Æ°ÔÁËÊÀ½ç!\n";
+				cout<<x[i].name<<"Êı¾İ:\n";
+				cout<<"Õ½Á¦:"<<x[i].army<<endl;
+				cout<<"ÎÄÃ÷µÈ¼¶:"<<l[x[i].level]<<endl;
 				system("pause");
 				exit(0); 
 			}
@@ -54,7 +54,6 @@ nation x[10000001];
 	}
 	void randth()
 	{
-		srand(clock()+time(0));
 		int b=rand()%7+1;
 	//	cout<<cnt<<endl;
 		if(cnt==0)
@@ -65,7 +64,7 @@ nation x[10000001];
 		{
 			win();
 		}
-		if(b==1)//æˆ˜äº‰
+		if(b==1)//Õ½Õù
 		{
 			int a=rand()%n+1;
 			int c=0;
@@ -80,8 +79,9 @@ nation x[10000001];
 						if(x[i].alive)
 						{
 							a=i;
+							break;
 						}
-						if(i==n)
+						else if(i==n)
 						{
 							win();
 						}
@@ -101,33 +101,34 @@ nation x[10000001];
 						if(x[i].alive&&i!=a)
 						{
 							b=i;
+							break; 
 						}
-						if(i==n)
+						else if(i==n)
 						{
 							win();
 						}
 					}
 				}
 			}
-			cout<<x[a].name<<"å‘"<<x[b].name<<"å®£æˆ˜\n";
+			cout<<x[a].name<<"Ïò"<<x[b].name<<"ĞûÕ½\n";
 			if(x[a].army>x[b].army)
 			{
-				cout<<x[a].name<<"å°†"<<x[b].name<<"æ‰“è´¥\n";
+				cout<<x[a].name<<"½«"<<x[b].name<<"´ò°Ü\n";
 				x[b].army/=2;
 				x[a].army-=x[b].army*1.5;
 			}
 			else if(x[a].army==x[b].army)
 			{
-				cout<<x[a].name<<"ä¸"<<x[b].name<<"æ‰“äº†ä¸ªå¹³æ‰‹\n";
+				cout<<x[a].name<<"Óë"<<x[b].name<<"´òÁË¸öÆ½ÊÖ\n";
 			}
 			else
 			{
-				cout<<x[b].name<<"å°†"<<x[a].name<<"æ‰“è´¥\n";
+				cout<<x[b].name<<"½«"<<x[a].name<<"´ò°Ü\n";
 				x[a].army/=2;
 				x[b].army-=x[a].army*1.5;
 			}
 		} 
-		else if(b==2)//ç§‘æŠ€çˆ†ç‚¸ 
+		else if(b==2)//¿Æ¼¼±¬Õ¨ 
 		{
 			int a=rand()%n+1;
 			int c=0;
@@ -142,18 +143,19 @@ nation x[10000001];
 						if(x[i].alive)
 						{
 							a=i;
+							break;
 						}
-						if(i==n)
+						else if(i==n)
 						{
 							win();
 						}
 					}
 				}
 			}
-			if(x[a].level!=6)
+			if(x[a].level<6)
 			{
 				x[a].level++;
-				cout<<x[a].name<<"å‘ç”Ÿç§‘æŠ€çˆ†ç‚¸,è¿›å…¥"<<l[x[a].level]<<endl;
+				cout<<x[a].name<<"·¢Éú¿Æ¼¼±¬Õ¨,½øÈë"<<l[x[a].level]<<endl;
 				x[a].army+=x[a].level*100;
 				if(x[a].level==5)
 				{
@@ -176,8 +178,9 @@ nation x[10000001];
 						if(x[i].alive)
 						{
 							a=i;
+							break;
 						}
-						if(i==n)
+						else if(i==n)
 						{
 							win();
 						}
@@ -185,7 +188,7 @@ nation x[10000001];
 				}
 			}
 			int t=rand()%10+30;
-			cout<<x[a].name<<"åˆ¶é€ äº†"<<t*5<<"ä¸ª"<<so[x[a].level]<<",æˆ˜åŠ›å¢åŠ "<<(x[a].level*x[a].level)*t<<endl;
+			cout<<x[a].name<<"ÖÆÔìÁË"<<t*5<<"¸ö"<<so[x[a].level]<<",Õ½Á¦Ôö¼Ó"<<(x[a].level*x[a].level)*t<<endl;
 			x[a].army+=(x[a].level*x[a].level)*t;
 		}
 		else if(nuclear.size()>1&&b==4)
@@ -210,8 +213,9 @@ nation x[10000001];
 						if(x[i].alive&&i!=a)
 						{
 							b=i;
+							break;
 						}
-						if(i==n)
+						else if(i==n)
 						{
 							win();
 						}
@@ -220,7 +224,7 @@ nation x[10000001];
 			}
 			if(x[a].level>=5)
 			{
-				cout<<x[a].name<<"å¯¹"<<x[b].name<<"å‘åŠ¨äº†æ ¸æ‰“å‡»\n";
+				cout<<x[a].name<<"¶Ô"<<x[b].name<<"·¢¶¯ÁËºË´ò»÷\n";
 				if(x[a].level==6)
 				{
 					if(x[b].level==6)
@@ -228,7 +232,7 @@ nation x[10000001];
 						int xx=rand()%10+1;
 						if(xx<=5)
 						{
-							cout<<x[b].name<<"æ‹¦æˆªå¹¶å‡»æ¯äº†æ ¸å¼¹\n";
+							cout<<x[b].name<<"À¹½Ø²¢»÷»ÙÁËºËµ¯\n";
 						}
 						else
 						{
@@ -236,7 +240,7 @@ nation x[10000001];
 							if(xxxx==1)
 							{
 								cout<<">>>";
-								cout<<x[a].name<<"å°†"<<x[b].name<<"ç”¨æ ¸å¼¹ç‚¸æˆäº†ä¸€ç‰‡åºŸå¢Ÿ,"<<x[b].name<<"ç­äº¡äº†\n";
+								cout<<x[a].name<<"½«"<<x[b].name<<"ÓÃ´óÁ¿ºËµ¯Õ¨³ÉÁËÒ»Æ¬·ÏĞæ,"<<x[b].name<<"ÃğÍöÁË\n";
 								if(x[b].level>=5)
 								{
 									nuclear.erase(b);
@@ -248,8 +252,8 @@ nation x[10000001];
 							else
 							{
 								cout<<">>>";
-								cout<<x[a].name<<"å°†"<<x[b].name<<"ç”¨æ ¸å¼¹ç‚¸æˆäº†ä¸€ç‰‡åºŸå¢Ÿ,"<<x[b].name<<"æ–‡æ˜é™çº§\n";
-								if(x[b].level==5)
+								cout<<x[a].name<<"½«"<<x[b].name<<"ÓÃ´óÁ¿ºËµ¯Õ¨³ÉÁËÒ»Æ¬·ÏĞæ,"<<x[b].name<<"ÎÄÃ÷½µ¼¶\n";
+								if(x[b].level>=5)
 								{
 									nuclear.erase(b);
 								}
@@ -267,7 +271,7 @@ nation x[10000001];
 						if(xxxx==1)
 						{
 							cout<<">>>";
-							cout<<x[a].name<<"å°†"<<x[b].name<<"ç”¨æ ¸å¼¹ç‚¸æˆäº†ä¸€ç‰‡åºŸå¢Ÿ,"<<x[b].name<<"ç­äº¡äº†\n";
+							cout<<x[a].name<<"½«"<<x[b].name<<"ÓÃ´óÁ¿ºËµ¯Õ¨³ÉÁËÒ»Æ¬·ÏĞæ,"<<x[b].name<<"ÃğÍöÁË\n";
 							if(x[b].level>=5)
 							{
 								nuclear.erase(b);
@@ -279,8 +283,8 @@ nation x[10000001];
 						else
 						{
 							cout<<">>>";
-							cout<<x[a].name<<"å°†"<<x[b].name<<"ç”¨æ ¸å¼¹ç‚¸æˆäº†ä¸€ç‰‡åºŸå¢Ÿ,"<<x[b].name<<"æ–‡æ˜é™çº§\n";
-							if(x[b].level==5)
+							cout<<x[a].name<<"½«"<<x[b].name<<"ÓÃ´óÁ¿ºËµ¯Õ¨³ÉÁËÒ»Æ¬·ÏĞæ,"<<x[b].name<<"ÎÄÃ÷½µ¼¶\n";
+							if(x[b].level>=5)
 							{
 								nuclear.erase(b);
 							}
@@ -301,7 +305,7 @@ nation x[10000001];
 							int xx=rand()%10+1;
 							if(xx<=5)
 							{
-								cout<<x[b].name<<"æ‹¦æˆªå¹¶å‡»æ¯äº†æ ¸å¼¹\n";
+								cout<<x[b].name<<"À¹½Ø²¢»÷»ÙÁËËùÓĞºËµ¯\n";
 							}
 							else
 							{
@@ -309,7 +313,7 @@ nation x[10000001];
 								if(xxxx==1)
 								{
 									cout<<">>>";
-									cout<<x[a].name<<"å°†"<<x[b].name<<"ç”¨æ ¸å¼¹ç‚¸æˆäº†ä¸€ç‰‡åºŸå¢Ÿ,"<<x[b].name<<"ç­äº¡äº†\n";
+									cout<<x[a].name<<"½«"<<x[b].name<<"ÓÃ´óÁ¿ºËµ¯Õ¨³ÉÁËÒ»Æ¬·ÏĞæ,"<<x[b].name<<"ÃğÍöÁË\n";
 									if(x[b].level>=5)
 									{
 										nuclear.erase(b);
@@ -321,9 +325,9 @@ nation x[10000001];
 								else
 								{
 									cout<<">>>";
-									cout<<x[a].name<<"å°†"<<x[b].name<<"ç”¨æ ¸å¼¹ç‚¸æˆäº†ä¸€ç‰‡åºŸå¢Ÿ,"<<x[b].name<<"æ–‡æ˜é™çº§\n";
+									cout<<x[a].name<<"½«"<<x[b].name<<"ÓÃ´óÁ¿ºËµ¯Õ¨³ÉÁËÒ»Æ¬·ÏĞæ,"<<x[b].name<<"ÎÄÃ÷½µ¼¶\n";
 									x[b].army/=2;
-									if(x[b].level==5)
+									if(x[b].level>=5)
 									{
 										nuclear.erase(b);
 									}
@@ -339,7 +343,7 @@ nation x[10000001];
 							if(xxxx==1)
 							{
 								cout<<">>>";
-								cout<<x[a].name<<"å°†"<<x[b].name<<"ç”¨æ ¸å¼¹ç‚¸æˆäº†ä¸€ç‰‡åºŸå¢Ÿ,"<<x[b].name<<"ç­äº¡äº†\n";
+								cout<<x[a].name<<"½«"<<x[b].name<<"ÓÃ´óÁ¿ºËµ¯Õ¨³ÉÁËÒ»Æ¬·ÏĞæ,"<<x[b].name<<"ÃğÍöÁË\n";
 								if(x[b].level>=5)
 								{
 									nuclear.erase(b);
@@ -351,9 +355,9 @@ nation x[10000001];
 							else
 							{
 								cout<<">>>";
-								cout<<x[a].name<<"å°†"<<x[b].name<<"ç”¨æ ¸å¼¹ç‚¸æˆäº†ä¸€ç‰‡åºŸå¢Ÿ,"<<x[b].name<<"æ–‡æ˜é™çº§\n";
+								cout<<x[a].name<<"½«"<<x[b].name<<"ÓÃ´óÁ¿ºËµ¯Õ¨³ÉÁËÒ»Æ¬·ÏĞæ,"<<x[b].name<<"ÎÄÃ÷½µ¼¶\n";
 								x[b].army/=2;
-								if(x[b].level==5)
+								if(x[b].level>=5)
 								{
 									nuclear.erase(b);
 								}
@@ -365,7 +369,7 @@ nation x[10000001];
 					}
 					else
 					{
-						cout<<x[a].name<<"å°„å‘"<<x[b].name<<"çš„æ ¸å¼¹æ‰“åäº†\n";
+						cout<<x[a].name<<"ÉäÏò"<<x[b].name<<"µÄºËµ¯´òÆ«ÁË\n";
 					}
 				}
 			}
@@ -388,26 +392,31 @@ nation x[10000001];
 							if(x[i].alive)
 							{
 								a=i;
+								break;
 							}
-							if(i==n)
+							else if(i==n)
 							{
 								win();
 							}
 						}
 					}
 				}
-				int xxx=rand()%10+1;
+				int xxx=rand()%20+1;
 				if(xxx<=3)
 				{
-					cout<<">>>"<<x[a].name<<"çš„ç¾¤ä¼—èµ·ä¹‰,"<<x[a].name<<"ç­äº¡äº†\n";
+					cout<<">>>"<<x[a].name<<"µÄÈºÖÚÆğÒå,"<<x[a].name<<"ÃğÍöÁË\n";
 					Sleep(1000);
 					x[a].alive=0;
 					cnt--;
+					if(x[a].level>=5)
+					{
+						nuclear.erase(a);
+					}
 				}
 				else
 				{
-					cout<<x[a].name<<"çš„ç¾¤ä¼—èµ·ä¹‰,"<<x[a].name<<"æ”¿åºœæˆåŠŸé•‡å‹\n";
-					x[a].army/=3;
+					cout<<x[a].name<<"µÄÈºÖÚÆğÒå,"<<x[a].name<<"Õş¸®³É¹¦ÕòÑ¹\n";
+					x[a].army*=0.7;
 				}
 			}
 		}
@@ -429,8 +438,9 @@ nation x[10000001];
 							if(x[i].alive)
 							{
 								a=i;
+								break;
 							}
-							if(i==n)
+							else if(i==n)
 							{
 								win();
 							}
@@ -440,24 +450,28 @@ nation x[10000001];
 				int xxx=rand()%10+1;
 				if(x[a].level>=4)
 				{
-					cout<<x[a].name<<"çˆ†å‘ç˜Ÿç–«,";
-					cout<<x[a].name<<"æˆåŠŸæ§åˆ¶ä½äº†ç–«æƒ…\n";
-					x[a].army/=2;
+					cout<<x[a].name<<"±¬·¢ÎÁÒß,";
+					cout<<x[a].name<<"³É¹¦¿ØÖÆ×¡ÁËÒßÇé\n";
+					x[a].army*=0.8;
 				}
 				else
 				{
-					if(xxx<=3)
+					if(xxx<=2)
 					{
-						cout<<">>>"<<x[a].name<<"çˆ†å‘ç˜Ÿç–«,"<<x[a].name<<"ç­äº¡äº†\n"; 
+						cout<<">>>"<<x[a].name<<"±¬·¢ÎÁÒß,"<<x[a].name<<"ÃğÍöÁË\n"; 
 						Sleep(1000);
 						x[a].alive=0;
 						cnt--;
+						if(x[a].level>=5)
+						{
+							nuclear.erase(a);
+						}
 					}
 					else
 					{
-						cout<<x[a].name<<"çˆ†å‘ç˜Ÿç–«,";
-						cout<<x[a].name<<"æˆåŠŸæ§åˆ¶ä½äº†ç–«æƒ…\n";
-						x[a].army/=2;
+						cout<<x[a].name<<"±¬·¢ÎÁÒß,";
+						cout<<x[a].name<<"³É¹¦¿ØÖÆ×¡ÁËÒßÇé\n";
+						x[a].army*=0.6;
 					}
 				}
 			}
@@ -480,8 +494,9 @@ nation x[10000001];
 							if(x[i].alive)
 							{
 								a=i;
+								break;
 							}
-							if(i==n)
+							else if(i==n)
 							{
 								win();
 							}
@@ -493,11 +508,11 @@ nation x[10000001];
 				{
 					if(x[a].level>=5)
 					{
-						cout<<x[a].name<<"çš„æ ¸ç”µç«™å †èŠ¯ç†”æ¯,å‘ç”Ÿæ°¢æ°”çˆ†ç‚¸,"<<x[a].name<<"æ”¿åºœè¿…é€Ÿæ§åˆ¶ä½äº†äº‹æ€\n";
-						x[a].army-=x[a].army/5;	
-						if(x[a].name=="Japan"||x[a].name=="japan"||x[a].name=="JP"||x[a].name=="jp"||x[a].name=="å²›å›½"||x[a].name=="æ—¥æœ¬"||x[a].name=="å°æ—¥å­")
+						cout<<x[a].name<<"µÄºËµçÕ¾¶ÑĞ¾ÈÛ»Ù,·¢ÉúÇâÆø±¬Õ¨,"<<x[a].name<<"Õş¸®Ñ¸ËÙ¿ØÖÆ×¡ÁËÊÂÌ¬\n";
+						x[a].army*=0.9;	
+						if(x[a].name=="Japan"||x[a].name=="japan"||x[a].name=="JP"||x[a].name=="jp"||x[a].name=="µº¹ú"||x[a].name=="ÈÕ±¾"||x[a].name=="Ğ¡ÈÕ×Ó")
 						{
-							cout<<"å¹¶äº2023å¹´8æœˆ24æ—¥æ’å‡ºäº†å—å †èŠ¯æ±¡æŸ“çš„æ ¸æ±¡æ°´\n";//æ¶æå°æ—¥å­ 
+							cout<<"²¢ÓÚ2023Äê8ÔÂ24ÈÕÅÅ³öÁËÊÜ¶ÑĞ¾ÎÛÈ¾µÄºËÎÛË®\n";//¶ñ¸ãĞ¡ÈÕ×Ó 
 						}
 					}
 				}
@@ -507,7 +522,7 @@ nation x[10000001];
 		{
 			if(x[i].army<=0&&x[i].alive)
 			{
-				cout<<">>>"<<x[i].name<<"çš„å†›é˜Ÿå’Œäººå£è¢«æ¶ˆè€—æ®†å°½,"<<x[i].name<<"ç­äº¡äº†\n";
+				cout<<">>>"<<x[i].name<<"µÄ¾ü¶ÓºÍÈË¿Ú±»ÏûºÄ´ù¾¡,"<<x[i].name<<"ÃğÍöÁË\n";
 				cnt--;
 				Sleep(1000);
 				x[i].alive=0;
@@ -522,6 +537,7 @@ nation x[10000001];
 int main()
 {
 	#ifndef __linux__
+		srand(time(0));
 		LANGID lang=GetUserDefaultUILanguage();
 		if(lang!=2052)
 		{
@@ -530,16 +546,17 @@ int main()
 			system("cls");
 		}
 		system("color b");
-		cout<<"å›½å®¶æ¨¡æ‹Ÿå™¨,Copyright 2023 ZZCjas\n";
-		cout<<"å›½å®¶æ•°:";
+		system("title ¹ú¼ÒÄ£ÄâÆ÷");
+		cout<<"¹ú¼ÒÄ£ÄâÆ÷,Copyright 2025 ZZCjas\n";
+		cout<<"¹ú¼ÒÊı:";
 		cin>>n;
-		cout<<"å„ä¸ªå›½å®¶çš„åå­—:\n";
+		cout<<"¸÷¸ö¹ú¼ÒµÄÃû×Ö:\n";
 		for(int i=1;i<=n;i++)
 		{
 			cin>>x[i].name;
 		}
 		system("cls");
-		cout<<n<<"ä¸ªå›½å®¶åœ¨ä¸€ç‰‡å¤§é™†ä¸Šè¯ç”Ÿäº†......\n";
+		cout<<n<<"¸ö¹ú¼ÒÔÚÒ»Æ¬´óÂ½ÉÏµ®ÉúÁË......\n";
 		cnt=n;
 		for(int i=1;i<=n;i++) 
 		{
@@ -547,12 +564,12 @@ int main()
 			x[i].level=1;
 			x[i].alive=1;
 		}
-		Sleep(2000);
+		Sleep(1000);
 		srand(time(0));
 		while(cnt>1)
 		{
 			randth();
-			Sleep(150);
+			Sleep(100);
 		} 
 		win();
 	#endif
