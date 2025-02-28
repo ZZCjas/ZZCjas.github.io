@@ -22,7 +22,7 @@ struct nation
 int n;
 int cnt; 
 set<int>nuclear;
-nation x[10000001];
+nation x[1000001];
 #ifndef __linux__
 	void lose()
 	{
@@ -66,7 +66,7 @@ nation x[10000001];
 	}
 	void randth()
 	{
-		srand(time(0)+rand()+clock());
+		srand(time(0)+rand()+clock()%6000);
 		int b=rand()%7+1;
 	//	cout<<cnt<<endl;
 		if(cnt==0)
@@ -266,7 +266,7 @@ nation x[10000001];
 							{
 								cout<<">>>";
 								cout<<x[a].name<<"将"<<x[b].name<<"用大量核弹炸成了一片废墟,"<<x[b].name<<"文明降级\n";
-								if(x[b].level>=5)
+								if(x[b].level==5)
 								{
 									nuclear.erase(b);
 								}
@@ -296,7 +296,7 @@ nation x[10000001];
 						{
 							cout<<">>>";
 							cout<<x[a].name<<"将"<<x[b].name<<"用大量核弹炸成了一片废墟,"<<x[b].name<<"文明降级\n";
-							if(x[b].level>=5)
+							if(x[b].level==5)
 							{
 								nuclear.erase(b);
 							}
@@ -339,7 +339,7 @@ nation x[10000001];
 									cout<<">>>";
 									cout<<x[a].name<<"将"<<x[b].name<<"用大量核弹炸成了一片废墟,"<<x[b].name<<"文明降级\n";
 									x[b].army/=2;
-									if(x[b].level>=5)
+									if(x[b].level==5)
 									{
 										nuclear.erase(b);
 									}
@@ -369,7 +369,7 @@ nation x[10000001];
 								cout<<">>>";
 								cout<<x[a].name<<"将"<<x[b].name<<"用大量核弹炸成了一片废墟,"<<x[b].name<<"文明降级\n";
 								x[b].army/=2;
-								if(x[b].level>=5)
+								if(x[b].level==5)
 								{
 									nuclear.erase(b);
 								}
