@@ -39,6 +39,18 @@ nation x[10000001];
 	}
 	void win()
 	{
+		int f=0;
+		for(int i=1;i<=n;i++)
+		{
+			if(x[i].alive)
+			{
+				f++;
+			}
+		}
+		if(f>1)
+		{
+			return;
+		}
 		for(int i=1;i<=n;i++)
 		{
 			if(x[i].alive)
@@ -54,6 +66,7 @@ nation x[10000001];
 	}
 	void randth()
 	{
+		srand(time(0)+rand()+clock());
 		int b=rand()%7+1;
 	//	cout<<cnt<<endl;
 		if(cnt==0)
@@ -230,7 +243,7 @@ nation x[10000001];
 					if(x[b].level==6)
 					{
 						int xx=rand()%10+1;
-						if(xx<=5)
+						if(xx<=6)
 						{
 							cout<<x[b].name<<"À¹½Ø²¢»÷»ÙÁËºËµ¯\n";
 						}
@@ -261,7 +274,6 @@ nation x[10000001];
 								x[b].level--;
 								x[b].level=max(x[b].level,1);
 								Sleep(1000);
-								cnt--;
 							}
 						}
 					}
