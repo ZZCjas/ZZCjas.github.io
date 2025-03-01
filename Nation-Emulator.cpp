@@ -10,8 +10,8 @@
 #include <set>
 using namespace std;
 const int stuckcnt=5000;//到stuckcnt时直接枚举,不使用随机数 
-string l[7]={"","石器时代","青铜时代","铁器时代","工业时代","原子时代","信息时代"};
-string so[7]={"","石斧步兵","持矛步兵","铁甲骑兵","步兵连","坦克连","重装合成旅"};
+string l[8]={"","石器时代","青铜时代","铁器时代","工业时代","原子时代","信息时代","太空时代"};
+string so[8]={"","石斧步兵","持矛步兵","铁甲骑兵","步兵连","坦克连","重装合成旅","太空舰队"};
 struct nation
 {
 	string name;
@@ -165,7 +165,7 @@ nation x[1000001];
 					}
 				}
 			}
-			if(x[a].level<6)
+			if(x[a].level<7)
 			{
 				x[a].level++;
 				cout<<x[a].name<<"发生科技爆炸,进入"<<l[x[a].level]<<endl;
@@ -201,8 +201,21 @@ nation x[1000001];
 				}
 			}
 			int t=rand()%10+30;
-			cout<<x[a].name<<"制造了"<<t*5<<"个"<<so[x[a].level]<<",战力增加"<<(x[a].level*x[a].level)*t<<endl;
-			x[a].army+=(x[a].level*x[a].level)*t;
+			int bf=t; 
+			if(x[a].level==7)
+			{
+				bf*=50;	
+			} 
+			if(x[a].level>=6)
+			{
+				bf*=3;
+			}
+			if(x[a].level>=5)
+			{
+				bf*=2;
+			}
+			cout<<x[a].name<<"制造了"<<t*5<<"个"<<so[x[a].level]<<",战力增加"<<(x[a].level*x[a].level)*bf<<endl;
+			x[a].army+=(x[a].level*x[a].level)*bf;
 		}
 		else if(nuclear.size()>1&&b==4)
 		{
