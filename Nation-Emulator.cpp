@@ -427,7 +427,7 @@ nation x[1000001];
 					}
 				}
 				int xxx=rand()%20+1;
-				if(xxx<=3)
+				if(xxx<=2)
 				{
 					cout<<">>>"<<x[a].name<<"的群众起义,"<<x[a].name<<"灭亡了\n";
 					Sleep(1000);
