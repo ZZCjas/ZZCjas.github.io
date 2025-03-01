@@ -208,11 +208,15 @@ nation x[1000001];
 			} 
 			if(x[a].level>=6)
 			{
-				bf*=3;
+				bf*=4;
 			}
 			if(x[a].level>=5)
 			{
-				bf*=2;
+				bf*=3;
+			} 
+			if(x[a].level>=4)
+			{
+				bf*=2; 
 			} 
 			cout<<x[a].name<<"制造了"<<t*5<<"个"<<so[x[a].level]<<",战力增加"<<(x[a].level*x[a].level)*bf<<endl;
 			x[a].army+=(x[a].level*x[a].level)*bf;
