@@ -2,6 +2,7 @@
 #include <unistd.h>
 #include <iostream>
 #include <sstream>
+#include <conio.h>
 #include <fstream>
 using namespace std;
 string s;
@@ -34,7 +35,7 @@ int main(int argc,char *argv[])
 	}
 	if(argc<2)
 	{
-		cout<<"Brainfuck Compile System,Copyright 2023 ZZCjas,G++ is Needed.\nInput the Brainfuck code:";
+		cout<<"Highly-Efficient Brainfuck Compile System (Windows Version)\nCopyright 2025 ZZCjas.\nThis Program Requires G++.\nInput the Brainfuck code:";
 		getline(cin,s);
 	}
 	cout<<"Input the Code\'s name:";
@@ -60,10 +61,18 @@ int main(int argc,char *argv[])
     printf("		if(s[i]=='+')\n");
     printf("		{\n");
     printf("			paper[ptr]++;\n");
+    printf("			if(paper[ptr]>=256)\n");
+    printf("			{\n");
+    printf("				paper[ptr]=0;\n");
+    printf("			}\n");
     printf("		}\n");
     printf("		else if(s[i]=='-')\n");
     printf("		{\n");
     printf("			paper[ptr]--;\n");
+    printf("			if(paper[ptr]<=-1)\n");
+    printf("			{\n");
+    printf("				paper[ptr]=255;\n");
+    printf("			}\n");
     printf("		}\n");
     printf("		else if(s[i]=='[')\n");
     printf("		{\n");
@@ -115,14 +124,19 @@ int main(int argc,char *argv[])
     printf("}\n");
     fflush(stdout);
     _dup2(p,1);
-    cout<<"Code Maked.Using G++ to Compile...\n";
+    cout<<"Code Maked.Using G++ to Compile..."<<endl;
+    fflush(stdout);
     if(system(("g++ "+name+".cpp -o "+name+".exe -O2").c_str())==0)
     {
-    	cout<<"Done!\n";
+    	cout<<"Compiled Finished!"<<endl;
 	}
 	else
 	{
-		cout<<"Error!\n";
+		cout<<"Error!"<<endl;
 	}
+	cout<<"Compiling is done and Thanks for using!"<<endl<<"Find the Latest Version of this programe on https://zzcjas.github.io/bf2c.cpp"<<endl;
+	cout<<"Press any key to end the program...";
+	fflush(stdout);
+	_getch();
     return 0;
 }
