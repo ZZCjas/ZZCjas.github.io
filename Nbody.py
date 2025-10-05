@@ -172,7 +172,7 @@ class NBodySim:
 class NBodyApp:
     def __init__(self, root):
         self.root = root
-        root.title("基于经典力学的天体运动模拟v1 By ZZCjas")
+        root.title("天体运动模拟器v1 By ZZCjas")
         self.sim = NBodySim()
         self.canvas_size = 720
         self.box_L = tk.DoubleVar(value=50.0)
@@ -256,6 +256,9 @@ class NBodyApp:
         ttk.Button(toolrow, text="示例：三体运动", command=self.load_example_three).grid(row=0, column=2, padx=(0,8))
         ttk.Button(toolrow, text="示例：引力弹弓", command=self.load_example_slingshot).grid(row=0, column=3,padx=(0,8))
         ttk.Button(toolrow, text="示例：行星系统", command=self.load_example_planetary).grid(row=0, column=4, padx=(0,8))
+        # 新增：拉格朗日点示例按钮
+        ttk.Button(toolrow, text="示例：拉格朗日点L4L5", command=self.load_example_lagrange).grid(row=0, column=5, padx=(0,8))
+        ttk.Button(toolrow, text="示例：拉格朗日点L1L2L3(不稳定)", command=self.load_example_lagrange123).grid(row=0, column=6, padx=(0,8))
         # 统计信息标签
         self.stats_text = tk.StringVar(value="天体: 0, 碎片: 0 | 最大速度: 0.00, 最大加速度: 0.00, 最大质量: 0.00 | 碎片最大速度: 0.00")
         ttk.Label(panel, textvariable=self.stats_text, foreground="#666", wraplength=300).grid(row=r, column=0, sticky="w", pady=(8,0)); r += 1
@@ -326,7 +329,7 @@ class NBodyApp:
         self.reset()
         m = 50.0; d = 2.0
         self.sim.add_body(-15.0, 0.0, 0.0, 0.83333, m, d, is_fragment=False)
-        self.sim.add_body(0, 15.0, 0.0, -1.8, 50.0, 2, is_fragment=False)
+        self.sim.add_body(0.0, 15.0, 0.0, 0.0, 50.0, 2, is_fragment=False)
         self.sim.add_body(15.0, 0.0, 0.0, -0.83333, m, d, is_fragment=False)
         self.status.set("示例：三体运动。")
         self._draw()
@@ -334,20 +337,20 @@ class NBodyApp:
     def load_example_slingshot(self):
         # 引力弹弓示例：一个大质量"行星"在原点，一个小探测器从远处飞来近掠后被弹出
         self.reset()
-        m_planet = 500.0
+        m_planet = 250.0
         d_planet = 5.0
         # 放在原点的静止大质量天体
         self.sim.add_body(0.0, 0.0, 0.0, 0.0, m_planet, d_planet, is_fragment=False)
         m_probe = 1.0
         d_probe = 0.8
-        start_x = 6
-        start_y = -35.0
-        vx_probe = 1.4   # 初始速度，靠得太慢会被捕获，太快则偏转太小
-        vy_probe = 11
+        start_x = 3.7
+        start_y = -36.0
+        vx_probe = 1.3   # 初始速度，靠得太慢会被捕获，太快则偏转太小
+        vy_probe = 7
         self.sim.add_body(start_x, start_y, vx_probe, vy_probe, m_probe, d_probe, is_fragment=False)
 
         # 可再加些轻微背景天体（可选）
-        self.status.set("示例：引力弹弓")
+        self.status.set("示例：引力弹弓（探测器绕行星飞行并被加速/偏转）")
         self._draw()
 
     def load_example_planetary(self):
@@ -376,9 +379,117 @@ class NBodyApp:
         self.sim.add_body(outer_orbit_radius, 0.0, 0.0, outer_orbital_speed,
                          outer_planet_mass, outer_planet_diam, is_fragment=False)
 
-        self.status.set("示例：行星系统")
+        self.status.set("示例：行星系统 - 中心恒星与绕行行星")
         self._draw()
 
+    def load_example_lagrange(self):
+        """创建拉格朗日点示例系统"""
+        self.reset()
+
+        # 大质量主星（类似太阳）
+        primary_mass = 500.0
+        primary_diam = 8.0
+        self.sim.add_body(0.0, 0.0, 0.0, 0.0, primary_mass, primary_diam, is_fragment=False)
+
+        # 次级天体（类似地球）
+        secondary_mass = 10.0
+        secondary_diam = 2.0
+        orbit_radius = 25.0
+        
+        # 计算次级天体的轨道速度
+        orbital_speed = math.sqrt(G * primary_mass / orbit_radius)
+        self.sim.add_body(orbit_radius, 0.0, 0.0, orbital_speed, 
+                         secondary_mass, secondary_diam, is_fragment=False)
+
+        # 在拉格朗日点L4和L5放置小质量天体
+        # L4和L5位于与两个大质量天体构成等边三角形的顶点
+        lagrange_mass = 0.1  # 非常小的质量，不影响系统
+        lagrange_diam = 0.5
+        
+        # L4点坐标 (相对于质心)
+        l4_x = orbit_radius / 2.0
+        l4_y = math.sqrt(3) * orbit_radius / 2.0
+        
+        # L5点坐标
+        l5_x = orbit_radius / 2.0
+        l5_y = -math.sqrt(3) * orbit_radius / 2.0
+        
+        # 计算拉格朗日点天体的速度（与次级天体相同的角速度）
+        # 在旋转坐标系中，这些点相对静止
+        l4_vx = -orbital_speed * math.sqrt(3) / 2.0
+        l4_vy = orbital_speed / 2.0
+        
+        l5_vx = orbital_speed * math.sqrt(3) / 2.0
+        l5_vy = orbital_speed / 2.0
+        
+        # 添加L4和L5点的小天体
+        self.sim.add_body(l4_x, l4_y, l4_vx, l4_vy, lagrange_mass, lagrange_diam, is_fragment=False)
+        self.sim.add_body(l5_x, l5_y, l5_vx, l5_vy, lagrange_mass, lagrange_diam, is_fragment=False)
+
+
+        self.status.set("示例：拉格朗日点系统 - L4和L5点(稳定)")
+        self._draw()
+    def load_example_lagrange123(self):
+        """创建拉格朗日点示例系统"""
+        self.reset()
+
+        # 大质量主星（类似太阳）
+        primary_mass = 500.0
+        primary_diam = 8.0
+        self.sim.add_body(0.0, 0.0, 0.0, 0.0, primary_mass, primary_diam, is_fragment=False)
+
+        # 次级天体（类似地球）
+        secondary_mass = 10.0
+        secondary_diam = 2.0
+        orbit_radius = 25.0
+        
+        # 计算次级天体的轨道速度
+        orbital_speed = math.sqrt(G * primary_mass / orbit_radius)
+        self.sim.add_body(orbit_radius, 0.0, 0.0, orbital_speed, 
+                         secondary_mass, secondary_diam, is_fragment=False)
+
+        # 在拉格朗日点L4和L5放置小质量天体
+        # L4和L5位于与两个大质量天体构成等边三角形的顶点
+        lagrange_mass = 0.1  # 非常小的质量，不影响系统
+        lagrange_diam = 0.5
+        
+        # L4点坐标 (相对于质心)
+        l4_x = orbit_radius / 2.0
+        l4_y = math.sqrt(3) * orbit_radius / 2.0
+        
+        # L5点坐标
+        l5_x = orbit_radius / 2.0
+        l5_y = -math.sqrt(3) * orbit_radius / 2.0
+        
+        # 计算拉格朗日点天体的速度（与次级天体相同的角速度）
+        # 在旋转坐标系中，这些点相对静止
+        l4_vx = -orbital_speed * math.sqrt(3) / 2.0
+        l4_vy = orbital_speed / 2.0
+        
+        l5_vx = orbital_speed * math.sqrt(3) / 2.0
+        l5_vy = orbital_speed / 2.0
+
+        # 可选：在L1、L2、L3点也放置小天体（这些点不稳定，但可以观察）
+        # L1点（在两个天体之间）
+        l1_x = orbit_radius * (1 - (secondary_mass / (3 * primary_mass))**(1/3))
+        l1_vx = 0.0
+        l1_vy = orbital_speed * l1_x / orbit_radius
+        self.sim.add_body(l1_x, 0.0, l1_vx, l1_vy, lagrange_mass/2, lagrange_diam/2, is_fragment=False)
+        
+        # L2点（在次级天体外侧）
+        l2_x = orbit_radius * (1 + (secondary_mass / (3 * primary_mass))**(1/3))
+        l2_vx = 0.0
+        l2_vy = orbital_speed * l2_x / orbit_radius
+        self.sim.add_body(l2_x, 0.0, l2_vx, l2_vy, lagrange_mass/2, lagrange_diam/2, is_fragment=False)
+        
+        # L3点（在主星另一侧）
+        l3_x = -orbit_radius * (1 + (5 * secondary_mass) / (12 * primary_mass))
+        l3_vx = 0.0
+        l3_vy = -orbital_speed * l3_x / orbit_radius  # 方向相反
+        self.sim.add_body(l3_x, 0.0, l3_vx, l3_vy, lagrange_mass/2, lagrange_diam/2, is_fragment=False)
+
+        self.status.set("示例：拉格朗日点系统 - L1、L2、L3点不稳定")
+        self._draw()
     # ---------- 碰撞特效 ----------
     def add_collision_effect(self, x, y, intensity=1.0):
         """添加碰撞特效"""
