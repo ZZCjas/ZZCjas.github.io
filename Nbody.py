@@ -183,6 +183,9 @@ class NBodyApp:
         self.new_diam = tk.DoubleVar(value=2.0)
         self.init_vx = tk.DoubleVar(value=0.0)
         self.init_vy = tk.DoubleVar(value=0.0)
+        # 新增坐标输入变量
+        self.new_x = tk.DoubleVar(value=0.0)
+        self.new_y = tk.DoubleVar(value=0.0)
 
         # 可调整参数（你可以改动这些以进一步控制碎片行为）
         self.roche_k = tk.DoubleVar(value=2.3)      # 洛希极限系数
@@ -237,7 +240,15 @@ class NBodyApp:
 
         ttk.Separator(panel, orient='horizontal').grid(row=r, column=0, sticky="ew", pady=8); r += 1
 
-        ttk.Label(panel, text="添加天体（点击画布放置）", font=("Microsoft YaHei", 11, "bold")).grid(row=r, column=0, sticky="w"); r += 1
+        ttk.Label(panel, text="添加天体（点击画布放置或输入坐标放置）", font=("Microsoft YaHei", 11, "bold")).grid(row=r, column=0, sticky="w"); r += 1
+        
+        # 新增坐标输入部分
+        ttk.Label(panel, text="坐标 x, y").grid(row=r, column=0, sticky="w"); r += 1
+        coord_frame = ttk.Frame(panel); coord_frame.grid(row=r, column=0, sticky="w"); r += 1
+        ttk.Entry(coord_frame, textvariable=self.new_x, width=10).grid(row=0, column=0, padx=(0,4))
+        ttk.Entry(coord_frame, textvariable=self.new_y, width=10).grid(row=0, column=1, padx=(0,4))
+        ttk.Button(coord_frame, text="按坐标添加", command=self.add_body_by_coords).grid(row=0, column=2, padx=(4,0))
+        
         ttk.Label(panel, text="质量 m").grid(row=r, column=0, sticky="w"); r += 1
         ttk.Scale(panel, from_=0.1, to=500, variable=self.new_mass, orient="horizontal", length=220).grid(row=r, column=0, sticky="w")  # 扩大范围
         ttk.Entry(panel, textvariable=self.new_mass, width=10).grid(row=r, column=0, sticky="e"); r += 1
@@ -263,7 +274,7 @@ class NBodyApp:
         self.stats_text = tk.StringVar(value="天体: 0, 碎片: 0 | 最大速度: 0.00, 最大加速度: 0.00, 最大质量: 0.00 | 碎片最大速度: 0.00")
         ttk.Label(panel, textvariable=self.stats_text, foreground="#666", wraplength=300).grid(row=r, column=0, sticky="w", pady=(8,0)); r += 1
 
-        self.status = tk.StringVar(value="提示：点击画布添加天体；所有飞出边界的天体会被删除。")
+        self.status = tk.StringVar(value="提示：所有飞出边界的天体会被删除。")
         ttk.Label(panel, textvariable=self.status, foreground="#666").grid(row=r, column=0, sticky="w", pady=(8,0)); r += 1
 
         ttk.Label(panel, text="天体数据（实时）", font=("Microsoft YaHei", 10, "bold")).grid(row=r, column=0, sticky="w", pady=(6,2)); r += 1
@@ -286,6 +297,9 @@ class NBodyApp:
 
     def on_canvas_click(self, event):
         xw, yw = self.screen_to_world(event.x, event.y)
+        # 更新坐标输入框的值
+        self.new_x.set(round(xw, 2))
+        self.new_y.set(round(yw, 2))
         m = max(1e-6, float(self.new_mass.get()))
         d = max(1e-6, float(self.new_diam.get()))
         vx = float(self.init_vx.get())
@@ -294,6 +308,29 @@ class NBodyApp:
         self.sim.add_body(xw, yw, vx, vy, m, d, is_fragment=False)
         self.status.set(f"已添加天体: pos=({xw:.2f},{yw:.2f}), v=({vx:.2f},{vy:.2f}), m={m:.2f}, d={d:.2f}")
         self._draw()
+
+    # 新增：通过坐标输入框添加天体的方法
+    def add_body_by_coords(self):
+        try:
+            x = float(self.new_x.get())
+            y = float(self.new_y.get())
+            m = max(1e-6, float(self.new_mass.get()))
+            d = max(1e-6, float(self.new_diam.get()))
+            vx = float(self.init_vx.get())
+            vy = float(self.init_vy.get())
+            
+            # 检查坐标是否在边界内
+            L = float(self.box_L.get())
+            if abs(x) > L or abs(y) > L:
+                messagebox.showwarning("警告", f"坐标超出边界范围(-{L:.1f} 到 {L:.1f})")
+                return
+                
+            # 用户添加的一般天体不是碎片
+            self.sim.add_body(x, y, vx, vy, m, d, is_fragment=False)
+            self.status.set(f"已添加天体: pos=({x:.2f},{y:.2f}), v=({vx:.2f},{vy:.2f}), m={m:.2f}, d={d:.2f}")
+            self._draw()
+        except ValueError:
+            messagebox.showerror("错误", "请输入有效的坐标数值")
 
     def toggle_run(self):
         self.running = not self.running
