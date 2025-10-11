@@ -53,9 +53,8 @@ class NBodySim:
 
     def detect_collision(self, roche_k=None):
         """
-        检测碰撞或接近（例如潮汐破碎）：
-        - 若 roche_k 为 None，只按重叠判断 (dist <= sum_r)
-        - 若提供 roche_k，则也检测当两体间距小于对应的 Roche 极限时返回该对（以质量较大的为基准计算）
+        简化的碰撞检测：仅基于几何接近（重叠或中心距小于半径和）来检测碰撞对。
+        保留形参 roche_k 以兼容调用方，但这里不再使用该参数。
         返回 (True, (i, j, dist)) 或 (False, None)
         """
         n = self.n
@@ -69,52 +68,9 @@ class NBodySim:
         dists = dist[iu]
         sum_r = (self.diam/2.0 + self.diam.T/2.0)[iu]
 
-        # 初始由几何重叠判定
         overlapped = dists <= sum_r
-
-        # 如果没有 roche_k 或没有任何重叠且不需额外判断，直接返回
-        if roche_k is None:
-            if np.any(overlapped):
-                k = np.where(overlapped)[0][0]
-                i, j = iu[0][k], iu[1][k]
-                return True, (i, j, dist[i, j])
-            return False, None
-
-        # 否则，计算基于 Roche 的判据（对上三角每对）
-        # 取成对索引
-        i_idx = iu[0]
-        j_idx = iu[1]
-
-        mi = self.mass[i_idx, 0]
-        mj = self.mass[j_idx, 0]
-        di = self.diam[i_idx, 0]
-        dj = self.diam[j_idx, 0]
-
-        # 体积与密度估计（球体）
-        vol_i = (math.pi / 6.0) * (di ** 3)
-        vol_j = (math.pi / 6.0) * (dj ** 3)
-        rho_i = mi / (vol_i + 1e-30)
-        rho_j = mj / (vol_j + 1e-30)
-
-        roche_limits = np.zeros_like(dists)
-        # 对每对按质量大小选择主导体来计算 Roche 限
-        heavier_is_i = mi >= mj
-        # 当 i 更大时：
-        R_big_i = di[heavier_is_i] / 2.0
-        roche_limits[heavier_is_i] = roche_k * R_big_i * (rho_i[heavier_is_i] / (rho_j[heavier_is_i] + 1e-12)) ** (1.0/3.0)
-        # 当 j 更大时：
-        heavier_is_j = ~heavier_is_i
-        R_big_j = dj[heavier_is_j] / 2.0
-        roche_limits[heavier_is_j] = roche_k * R_big_j * (rho_j[heavier_is_j] / (rho_i[heavier_is_j] + 1e-12)) ** (1.0/3.0)
-
-        # 修复：计算重叠阈值 - 使用正确的索引方式
-        overlap_thresholds = 0.5 * (di/2.0 + dj/2.0)
-
-        # 判定：重叠或在 Roche 内
-        close_or_tidal = np.logical_or(overlapped, dists < np.maximum(roche_limits, overlap_thresholds))
-
-        if np.any(close_or_tidal):
-            k = np.where(close_or_tidal)[0][0]
+        if np.any(overlapped):
+            k = np.where(overlapped)[0][0]
             i, j = iu[0][k], iu[1][k]
             return True, (i, j, dist[i, j])
         return False, None
@@ -172,7 +128,7 @@ class NBodySim:
 class NBodyApp:
     def __init__(self, root):
         self.root = root
-        root.title("天体运动模拟器v1 By ZZCjas")
+        root.title("天体运动模拟器v2 By ZZCjas")
         self.sim = NBodySim()
         self.canvas_size = 720
         self.box_L = tk.DoubleVar(value=50.0)
@@ -188,12 +144,16 @@ class NBodyApp:
         self.new_y = tk.DoubleVar(value=0.0)
 
         # 可调整参数（你可以改动这些以进一步控制碎片行为）
-        self.roche_k = tk.DoubleVar(value=2.3)      # 洛希极限系数
-        self.max_total_frags = tk.IntVar(value=12)   # 全局碎片上限 - 增加
+        self.roche_k = tk.DoubleVar(value=2.3)      # 洛希极限系数（保留UI，不再作为碰撞触发）
+        self.max_total_frags = tk.IntVar(value=12)  # 全局碎片上限 - 增加
         self.similar_thresh = 0.4      # 近质量碎裂阈值
         self.min_frag_mass = 0.01      # 碎片最小质量 - 减小
         self.small_frag_scale_limit = 8  # 小体粉碎时最多碎片数 - 增加
-        
+
+        # 新增：基于能量判定的 UI 可调阈值
+        self.merge_factor = tk.DoubleVar(value=0.5)     # KE_rel <= merge_factor * U → 合并
+        self.shatter_factor = tk.DoubleVar(value=2.0)   # KE_rel >= shatter_factor * U → 强裂
+
         # 碰撞特效
         self.collision_effects = []  # 存储碰撞特效
 
@@ -230,13 +190,26 @@ class NBodyApp:
         ttk.Scale(panel, from_=10, to=200, variable=self.box_L, orient="horizontal", length=220).grid(row=r, column=0, sticky="w")
         ttk.Entry(panel, textvariable=self.box_L, width=10).grid(row=r, column=0, sticky="e"); r += 1
 
-        ttk.Label(panel, text="洛希极限系数").grid(row=r, column=0, sticky="w"); r += 1
-        ttk.Scale(panel, from_=1.0, to=5.0, variable=self.roche_k, orient="horizontal", length=220).grid(row=r, column=0, sticky="w")
-        ttk.Entry(panel, textvariable=self.roche_k, width=10).grid(row=r, column=0, sticky="e"); r += 1
+        #ttk.Label(panel, text="洛希极限系数（弃用）").grid(row=r, column=0, sticky="w"); r += 1
+        #ttk.Scale(panel, from_=1.0, to=5.0, variable=self.roche_k, orient="horizontal", length=220).grid(row=r, column=0, sticky="w")
+        #ttk.Entry(panel, textvariable=self.roche_k, width=10).grid(row=r, column=0, sticky="e"); r += 1
 
         ttk.Label(panel, text="最大碎片数量").grid(row=r, column=0, sticky="w"); r += 1
         ttk.Scale(panel, from_=2, to=50, variable=self.max_total_frags, orient="horizontal", length=220).grid(row=r, column=0, sticky="w")  # 扩大范围
         ttk.Entry(panel, textvariable=self.max_total_frags, width=10).grid(row=r, column=0, sticky="e"); r += 1
+
+        # ================= 新增：基于能量判据的阈值滑动条 =================
+        ttk.Separator(panel, orient='horizontal').grid(row=r, column=0, sticky="ew", pady=8); r += 1
+        ttk.Label(panel, text="碰撞能量判据（动能 vs 结合能）", font=("Microsoft YaHei", 11, "bold")).grid(row=r, column=0, sticky="w"); r += 1
+
+        ttk.Label(panel, text="合并阈值系数").grid(row=r, column=0, sticky="w"); r += 1
+        ttk.Scale(panel, from_=0.1, to=1.5, variable=self.merge_factor, orient="horizontal", length=220).grid(row=r, column=0, sticky="w")
+        ttk.Entry(panel, textvariable=self.merge_factor, width=10).grid(row=r, column=0, sticky="e"); r += 1
+
+        ttk.Label(panel, text="碎裂阈值系数").grid(row=r, column=0, sticky="w"); r += 1
+        ttk.Scale(panel, from_=1.0, to=5.0, variable=self.shatter_factor, orient="horizontal", length=220).grid(row=r, column=0, sticky="w")
+        ttk.Entry(panel, textvariable=self.shatter_factor, width=10).grid(row=r, column=0, sticky="e"); r += 1
+        # ================= 以上新增 UI =================
 
         ttk.Separator(panel, orient='horizontal').grid(row=r, column=0, sticky="ew", pady=8); r += 1
 
@@ -269,7 +242,7 @@ class NBodyApp:
         ttk.Button(toolrow, text="示例：行星系统", command=self.load_example_planetary).grid(row=0, column=4, padx=(0,8))
         # 新增：拉格朗日点示例按钮
         ttk.Button(toolrow, text="示例：拉格朗日点L4L5", command=self.load_example_lagrange).grid(row=0, column=5, padx=(0,8))
-        ttk.Button(toolrow, text="示例：拉格朗日点L1L2L3(不稳定)", command=self.load_example_lagrange123).grid(row=0, column=6, padx=(0,8))
+        # ttk.Button(toolrow, text="示例：拉格朗日点L1L2L3(不稳定)", command=self.load_example_lagrange123).grid(row=0, column=6, padx=(0,8))
         # 统计信息标签
         self.stats_text = tk.StringVar(value="天体: 0, 碎片: 0 | 最大速度: 0.00, 最大加速度: 0.00, 最大质量: 0.00 | 碎片最大速度: 0.00")
         ttk.Label(panel, textvariable=self.stats_text, foreground="#666", wraplength=300).grid(row=r, column=0, sticky="w", pady=(8,0)); r += 1
@@ -554,7 +527,7 @@ class NBodyApp:
         for i in sorted(effects_to_remove, reverse=True):
             self.collision_effects.pop(i)
 
-    # ---------- 碰撞与碎片化（更节制） ----------
+    # ---------- 碰撞与碎片化（基于能量判据） ----------
     def resolve_collision(self, idx_a, idx_b):
         if idx_a == idx_b:
             return
@@ -596,11 +569,25 @@ class NBodyApp:
         com_vel = (m_big * v_big + m_small * v_small) / total_mass
         sep_vec = p_small - p_big
         sep = np.linalg.norm(sep_vec) + 1e-12
-        rel_speed = np.linalg.norm(v_big - v_small)
+        rel_vel_vec = v_big - v_small
+        rel_speed = np.linalg.norm(rel_vel_vec)
 
-        # 如果小体是碎片且质量很小，直接吸收
-        if is_frag_small and m_small / m_big < 0.02:  # 碎片质量小于大天体的2%时直接吸收
-            # 合并到主体
+        # 相对动能（质心系）
+        mu = (m_big * m_small) / (m_big + m_small + 1e-30)
+        KE_rel = 0.5 * mu * (rel_speed ** 2)
+
+        # 引力结合能量级（使用有效距离避免数值爆炸）
+        r1 = d_big / 2.0
+        r2 = d_small / 2.0
+        r_eff = max(sep, 0.5 * (r1 + r2), 1e-6)
+        U = G * m_big * m_small / r_eff  # 取正值表示“结合能规模”
+
+        # UI 可调阈值
+        merge_factor = float(self.merge_factor.get())     # 合并阈值：KE_rel <= merge_factor * U
+        shatter_factor = float(self.shatter_factor.get()) # 强裂阈值：KE_rel >= shatter_factor * U
+
+        # 先处理极小碎片的快速吸收（保留原逻辑）
+        if is_frag_small and m_small / m_big < 0.02:
             vol_big = math.pi / 6.0 * (d_big ** 3)
             vol_small = math.pi / 6.0 * (d_small ** 3)
             combined_vol = vol_big + vol_small
@@ -609,42 +596,18 @@ class NBodyApp:
             else:
                 merged_d = max(0.05, (total_mass ** (1.0/3.0)) * 0.6)
 
-            # 就地更新较大天体的数据，然后仅删除较小天体（避免索引混淆）
             self.sim.pos[big_idx] = com_pos
             self.sim.vel[big_idx] = com_vel
             self.sim.mass[big_idx, 0] = total_mass
             self.sim.diam[big_idx, 0] = merged_d
-            self.sim.is_frag[big_idx, 0] = is_frag_big  # 保持原有类型
-            
-            # 删除较小天体
+            self.sim.is_frag[big_idx, 0] = is_frag_big
             self.sim.delete_indices([small_idx])
-            # 刷新加速度
             self.sim.acc = self.sim.accelerations()
             return
 
-        # Roche 判定（并加上重叠保底）
-        vol_big = math.pi / 6.0 * (d_big ** 3)
-        vol_small = math.pi / 6.0 * (d_small ** 3)
-        rho_big = m_big / vol_big if vol_big > 0 else 1.0
-        rho_small = m_small / vol_small if vol_small > 0 else 1.0
-        roche_k = float(self.roche_k.get())  # 由界面滑块直接控制
-        R_big = d_big / 2.0
-        # 标准形式
-        roche_limit = roche_k * R_big * (rho_big / (rho_small + 1e-12)) ** (1.0/3.0)
-        # 如果两个天体严重重叠（中心距远小于合并半径的一定比例），也应被视为粉碎
-        overlap_threshold = 0.5 * (R_big + d_small/2.0)
-        if sep < roche_limit or sep < overlap_threshold:
-            self._shred_small_into_fragments(big_idx, small_idx, p_big, v_big, m_big, d_big,
-                                             p_small, v_small, m_small, d_small, com_vel, rel_speed)
-            # 刷新加速度
-            self.sim.acc = self.sim.accelerations()
-            return
-
-        # 吸收判据：若质量悬殊则吸收（保留）
-        absorb_thresh = 0.05
-        mass_ratio = m_small / m_big
-        if mass_ratio <= absorb_thresh:
-            # 计算合并后质量/位置/速度/直径（通过体积相加）
+        # 基于能量的三段式判定
+        if KE_rel <= merge_factor * U:
+            # 吸收/合并
             merged_mass = total_mass
             merged_pos = com_pos
             merged_vel = com_vel
@@ -656,26 +619,33 @@ class NBodyApp:
             else:
                 merged_d = max(0.05, (merged_mass ** (1.0/3.0)) * 0.6)
 
-            # 就地更新较大天体的数据，然后仅删除较小天体（避免索引混淆）
             self.sim.pos[big_idx] = merged_pos
             self.sim.vel[big_idx] = merged_vel
             self.sim.mass[big_idx, 0] = merged_mass
             self.sim.diam[big_idx, 0] = merged_d
-            self.sim.is_frag[big_idx, 0] = False  # 合并后成为主体
-            
-            # 更新 prev_vel 与 acc 以避免显示异常
+            self.sim.is_frag[big_idx, 0] = False
+
             if self.sim.prev_vel.shape[0] > big_idx:
                 self.sim.prev_vel[big_idx] = merged_vel
             if self.sim.acc.shape[0] > big_idx:
                 self.sim.acc[big_idx] = 0.0
 
-            # 删除较小天体
             self.sim.delete_indices([small_idx])
-            # 刷新加速度
             self.sim.acc = self.sim.accelerations()
             return
 
-        # 否则较为接近质量或中等质量差，进行受限碎裂/剥离（生成较少碎片）
+        if KE_rel >= shatter_factor * U:
+            # 强烈粉碎：小体远小 → 粉碎小体；接近质量 → 整体粉碎
+            if m_small / total_mass < 0.35:
+                self._shred_small_into_fragments(big_idx, small_idx, p_big, v_big, m_big, d_big,
+                                                 p_small, v_small, m_small, d_small, com_vel, rel_speed)
+            else:
+                self._full_shatter_and_add(total_mass, com_pos, com_vel, rel_speed)
+                self.sim.delete_indices([big_idx, small_idx])
+            self.sim.acc = self.sim.accelerations()
+            return
+
+        # 中间能量区间：部分碎裂/剥离
         self._fragment_collision_limited(big_idx, small_idx, p_big, v_big, m_big, d_big,
                                          p_small, v_small, m_small, d_small, rel_speed)
         self.sim.acc = self.sim.accelerations()
@@ -707,8 +677,6 @@ class NBodyApp:
             frag_vels.append(vel)
 
         # 删除原两体，重新加入大体并加入碎片（碎片标记为 is_fragment=True）
-        # 删除时要先删除索引较大的那个以避免索引错位
-        # 为简便，先记住大体原数据，再删除两个，再重新加入大体与碎片
         big_data = (p_big.copy(), v_big.copy(), m_big, d_big)
         self.sim.delete_indices([big_idx, small_idx])
         # 重新加入大体（非碎片）
@@ -800,7 +768,6 @@ class NBodyApp:
             new_isfrag = []
             for k in range(len(fragments_mass)):
                 if not mask[k]:
-                    # 将被过滤掉的小质量合并到主残余（如果存在），否则累积到第一个
                     continue
                 new_pos.append(fragments_pos[k]); new_vel.append(fragments_vel[k]); new_mass.append(fragments_mass[k]); new_isfrag.append(fragments_isfrag[k])
             if len(new_mass) == 0:
@@ -808,7 +775,6 @@ class NBodyApp:
             fragments_pos = new_pos; fragments_vel = new_vel; fragments_mass = new_mass; fragments_isfrag = new_isfrag
 
         max_frags = int(self.max_total_frags.get())
-        # 合并最小两个直到数量满足限制，同时保持 isfrag 跟随合并后质量（若合并后最大则作为非碎片）
         while len(fragments_mass) > max_frags:
             idxs = np.argsort(fragments_mass)
             a, b = idxs[0], idxs[1]
@@ -819,7 +785,7 @@ class NBodyApp:
             m_new = ma + mb
             p_new = (ma * pa + mb * pb) / m_new
             v_new = (ma * va + mb * vb) / m_new
-            isf_new = isfa and isfb  # 只有当两个都是碎片时，新合并对象才是碎片；否则保留为主体（False）
+            isf_new = isfa and isfb
             new_pos = []; new_vel = []; new_mass = []; new_isfrag = []
             for k in range(len(fragments_mass)):
                 if k in (a, b): continue
@@ -889,7 +855,7 @@ class NBodyApp:
         max_collisions_per_step = 6
         handled = 0
         while True:
-            # 传入当前界面控制的 roche_k，使得接近潮汐半径也会触发处理
+            # 传入 roche_k（兼容调用），但 detect_collision 内部已忽略
             collided, info = self.sim.detect_collision(roche_k=float(self.roche_k.get()))
             if not collided:
                 break
