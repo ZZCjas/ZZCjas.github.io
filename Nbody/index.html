@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>天体运动模拟器 - N-Body Simulator</title>
+    <link rel="icon" href="favicon.ico" type="image/x-icon">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #0a0a1a;
+            color: #e0e0ff;
+            line-height: 1.6;
+            background-image: url('back.png');
+            background-size: cover;
+            background-attachment: fixed;
+            background-position: center;
+            min-height: 100vh;
+            position: relative;
+        }
+        
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(10, 10, 26, 0.85);
+            z-index: -1;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        header {
+            text-align: center;
+            padding: 3rem 0;
+            position: relative;
+        }
+        
+        h1 {
+            font-size: 3.5rem;
+            margin-bottom: 1rem;
+            background: linear-gradient(to right, #4facfe, #00f2fe);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 15px rgba(79, 172, 254, 0.3);
+        }
+        
+        .subtitle {
+            font-size: 1.4rem;
+            color: #a0a0ff;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .hero {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 2rem;
+            margin: 3rem 0;
+        }
+        
+        .hero-content {
+            flex: 1;
+            min-width: 300px;
+        }
+        
+        .hero-image {
+            flex: 1;
+            min-width: 300px;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(79, 172, 254, 0.3);
+            position: relative;
+        }
+        
+        .simulation-image {
+            width: 100%;
+            height: 300px;
+            object-fit: cover;
+            display: block;
+        }
+        
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin: 3rem 0;
+        }
+        
+        .feature-card {
+            background: rgba(20, 20, 40, 0.7);
+            border-radius: 12px;
+            padding: 1.5rem;
+            border: 1px solid rgba(79, 172, 254, 0.2);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+            border-color: rgba(79, 172, 254, 0.5);
+        }
+        
+        .feature-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            color: #4facfe;
+        }
+        
+        .feature-card h3 {
+            font-size: 1.4rem;
+            margin-bottom: 1rem;
+            color: #e0e0ff;
+        }
+        
+        .links {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin: 3rem 0;
+            flex-wrap: wrap;
+        }
+        
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 1rem 2rem;
+            background: linear-gradient(135deg, #4facfe, #00f2fe);
+            color: #0a0a1a;
+            text-decoration: none;
+            border-radius: 50px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(79, 172, 254, 0.4);
+        }
+        
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(79, 172, 254, 0.6);
+        }
+        
+        .btn-secondary {
+            background: linear-gradient(135deg, #ff9a9e, #c86dd7);
+            box-shadow: 0 5px 15px rgba(255, 154, 158, 0.4);
+        }
+        
+        .btn-secondary:hover {
+            box-shadow: 0 8px 20px rgba(255, 154, 158, 0.6);
+        }
+        
+        .screenshots {
+            margin: 4rem 0;
+        }
+        
+        .screenshot-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+        
+        .screenshot {
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            transition: transform 0.3s ease;
+            background: rgba(30, 30, 60, 0.5);
+            height: 200px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid rgba(79, 172, 254, 0.2);
+        }
+        
+        .screenshot:hover {
+            transform: scale(1.05);
+        }
+        
+        .screenshot img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .project-description {
+            background: rgba(20, 20, 40, 0.7);
+            border-radius: 12px;
+            padding: 2rem;
+            margin: 3rem 0;
+            border: 1px solid rgba(79, 172, 254, 0.2);
+        }
+        
+        .project-description h2 {
+            color: #4facfe;
+            margin-bottom: 1.5rem;
+            font-size: 2rem;
+        }
+        
+        .project-description p {
+            margin-bottom: 1rem;
+        }
+        
+        footer {
+            text-align: center;
+            padding: 2rem 0;
+            margin-top: 3rem;
+            border-top: 1px solid rgba(79, 172, 254, 0.2);
+            color: #a0a0ff;
+        }
+        
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2.5rem;
+            }
+            
+            .subtitle {
+                font-size: 1.2rem;
+            }
+            
+            .links {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .btn {
+                width: 100%;
+                max-width: 300px;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>天体运动模拟器</h1>
+            <p class="subtitle">基于牛顿万有引力定律的N体系统物理模拟，探索宇宙天体的运动规律</p>
+        </header>
+        
+        <section class="hero">
+            <div class="hero-content">
+                <h2>探索宇宙的奥秘</h2>
+                <p>天体运动模拟器是一个基于Python和Tkinter开发的交互式物理模拟工具，能够精确模拟多个天体在引力作用下的运动轨迹。</p>
+                <p>通过这个模拟器，你可以观察双星系统、行星轨道、引力弹弓效应以及天体碰撞等壮观的天文现象。</p>
+                
+                <div class="links">
+                    <a href="https://github.com/ZZCjas/N-Body-Simulator" class="btn" target="_blank">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+                        </svg>
+                        查看GitHub仓库
+                    </a>
+                    <a href="https://github.com/ZZCjas/N-Body-Simulator/releases" class="btn btn-secondary" target="_blank">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12 15l-5-5h10l-5 5zm0-12l10 10h-20l10-10z"/>
+                        </svg>
+                        下载最新版本
+                    </a>
+                </div>
+            </div>
+            
+            <div class="hero-image">
+                <img src="sim.png" alt="天体运动模拟示意图" class="simulation-image">
+            </div>
+        </section>
+        
+        <section class="project-description">
+            <h2>项目简介</h2>
+            <p>天体运动模拟器是一个基于Python和Tkinter开发的交互式物理模拟工具，能够精确模拟多个天体在引力作用下的运动轨迹。</p>
+            <p>通过这个模拟器，你可以观察双星系统、行星轨道、引力弹弓效应以及天体碰撞等壮观的天文现象。该工具采用牛顿万有引力定律，使用蛙跳法进行数值积分，确保天体运动的精确模拟。</p>
+            <p>项目还实现了基于能量判据的碰撞处理系统，能够根据相对动能与结合能的比例决定碰撞结果，实现天体合并、碎裂和剥离等真实物理效果。</p>
+        </section>
+        
+        <section class="features">
+            <div class="feature-card">
+                <div class="feature-icon">🌌</div>
+                <h3>精确物理模拟</h3>
+                <p>基于牛顿万有引力定律，使用蛙跳法进行数值积分，确保天体运动的精确模拟。</p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">💥</div>
+                <h3>智能碰撞系统</h3>
+                <p>基于能量判据的碰撞处理系统，实现天体合并、碎裂和剥离等真实物理效果。</p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">🎮</div>
+                <h3>交互式操作</h3>
+                <p>直观的图形界面，支持点击添加天体、调整参数和实时数据监控。</p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">🔄</div>
+                <h3>预设示例系统</h3>
+                <p>内置双星系统、三体问题、行星系统等多种示例，便于学习和演示。</p>
+            </div>
+        </section>
+        
+        <section class="screenshots">
+            <h2>功能展示</h2>
+            <div class="screenshot-grid">
+                <div class="screenshot">
+                    <img src="binary.png" alt="双星系统模拟">
+                </div>
+                <div class="screenshot">
+                    <img src="planetary.png" alt="行星系统轨道">
+                </div>
+                <div class="screenshot">
+                    <img src="collision.png" alt="天体碰撞效果">
+                </div>
+                <div class="screenshot">
+                    <img src="slingshot.png" alt="引力弹弓演示">
+                </div>
+            </div>
+        </section>
+        
+        <footer>
+            <p>© 2023 天体运动模拟器项目 | 开发者: ZZCjas</p>
+            <p>探索宇宙，从模拟开始</p>
+        </footer>
+    </div>
+</body>
+</html>
